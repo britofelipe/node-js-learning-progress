@@ -1,18 +1,16 @@
-const EventEmitter = require("events");
+var http = require("http");
+var fs = require("fs");
 
-const customEmitter = new EventEmitter();
-// instance of our class
-
-// on - listen for an event
-// emit - emit that event
-
-customEmitter.emit("Response");
-
-// Order matters
-customEmitter.on("response", () => { // tje second parameter is the call back function
-    console.log("Data received");
-})
-customEmitter.on("response", () => { // tje second parameter is the call back function
-    console.log("Some other logic here");
-})
-
+http
+    .createServer(function (req, res) {
+        // const text = fs.readFileSync("./content/big.txt", "utf-8");
+        // res.end(text);
+        const fileStream = fs.createReadStream("./content/big.txt", "utf-8");
+        fileStream.on("open", () => {
+            fileStream.pipe(res); // push read stream into filestream
+        })
+        fileStream.on("error", (err) => {
+            res.end(err);
+        })
+    })
+    .listen(5000);
